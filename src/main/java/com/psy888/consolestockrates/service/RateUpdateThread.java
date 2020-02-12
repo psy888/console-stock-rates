@@ -2,11 +2,13 @@ package com.psy888.consolestockrates.service;
 
 import com.psy888.consolestockrates.model.Rate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 @Service
 @Scope("prototype")
@@ -17,9 +19,7 @@ public class RateUpdateThread implements Runnable {
     RateToDb rateToDb;
     @Autowired
     IexCloudRateService iexCloudRateService;
-    //    @Qualifier("asyncExecutor")
-//    @Autowired
-//    Executor taskExecutor;
+
 
     private String symbol;
 
@@ -38,31 +38,9 @@ public class RateUpdateThread implements Runnable {
     @Override
     public void run() {
         try {
-//            Future<Rate> rateFeature =  taskExecutor.submit(() -> iexCloudRateService.getData(symbol));
-//        System.out.println(rateFeature.get().toString());
-//            System.out.println("thread started " + this.getSymbol());
-
-//            rateToDb.saveToDb(symbol, iexCloudRateService.getData(symbol));
             CompletableFuture<Rate> completableFuture = iexCloudRateService.getData(symbol);
-            completableFuture.thenAccept(rate -> rateToDb.saveToDb(symbol, rate));
-            try {
-                Thread.sleep(10);
-            } catch (InterruptedException e) {
-                System.out.println(e.getMessage());
-            }
-            completableFuture.join();
+            completableFuture.thenAccept(rate -> rateToDb.saveToDb(rate));
             completableFuture.get();
-
-////            requests.add(completableFuture);
-//            while (true){/
-//                if(completableFuture.isDone()) {
-//                    rateToDb.saveToDb(symbol, completableFuture.get());
-//                    break;
-//                }
-//            }
-
-//            CompletableFuture.allOf(completableFuture).join();
-//            System.out.println("thread finished " + this.getSymbol());
         } catch (InterruptedException | ExecutionException ieEe) {
             ieEe.printStackTrace();
         }

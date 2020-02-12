@@ -72,6 +72,6 @@ public class Rate implements RestData,Comparable<Rate> {
 
     @Override
     public int compareTo(Rate o) {
-        return this.latestPrice.compareTo(o.getLatestPrice());
+        return this.latestPrice.compareTo(o.latestPrice);
     }
 }

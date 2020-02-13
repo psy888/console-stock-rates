@@ -2,8 +2,6 @@ package com.psy888.consolestockrates.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -82,9 +80,9 @@ public class Rate implements Serializable, Comparable<Rate> {
     public String toString() {
         return "Rate{" +
                 " symbol='" + symbol + '\'' +
-                ", company=" + company.getName() +
-                ", latestPrice=" + latestPrice +
-                ", changePercent=" + changePercent +
+                ", \tcompany=" + company.getName() +
+                ", \t\tlatestPrice=" + latestPrice +
+                ", \t\tchangePercent=" + changePercent +
                 '}';
     }
 

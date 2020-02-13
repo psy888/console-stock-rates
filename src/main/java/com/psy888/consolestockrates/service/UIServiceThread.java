@@ -21,7 +21,8 @@ public class UIServiceThread implements Runnable{
             System.out.println("\n\n\n\n\n\n\n\n\n"); //spacer
             System.out.println("The top 5 highest value stocks");
             top5stocks();
-            System.out.println("The most recent 5 companies that have the greatest change percent in stock value");
+
+            System.out.println("\n\nThe most recent 5 companies that have the greatest change percent in stock value");
             top5change();
         }
         if (massage.length() > 0) {

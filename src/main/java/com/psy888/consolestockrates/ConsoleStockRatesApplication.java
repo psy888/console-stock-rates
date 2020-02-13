@@ -45,14 +45,14 @@ public class ConsoleStockRatesApplication implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         taskExecutor = context.getBean("cachedExecutor", ExecutorService.class);
-
         System.out.println("Start company query");
         LocalTime t = LocalTime.now();
         companyToDb.saveToDb(iexCloudCompanyService.getData());
         System.out.println("Finish company query " + SECONDS.between(t, LocalTime.now()) + " seconds");
 //
         System.out.println("Start rate query");
-        scheduledExecutorService.scheduleAtFixedRate(this::updateRates, 0, 15L, TimeUnit.MINUTES);
+
+        scheduledExecutorService.scheduleAtFixedRate(this::updateRates, 0, 25L, TimeUnit.MINUTES);
         scheduledExecutorService.scheduleAtFixedRate(uiServiceThread, 5L, 10L, TimeUnit.SECONDS);
 
 
@@ -60,11 +60,9 @@ public class ConsoleStockRatesApplication implements CommandLineRunner {
     }
 
     private void updateRates() {
-        if (taskExecutor.isTerminated()) {
+
             companyRepository.findAllByIsEnabledContaining("true").forEach(company -> {
                 taskExecutor.execute(rateUpdateThread.setSymbol(company.getSymbol()));
             });
-            taskExecutor.shutdown();
-        }
     }
 }

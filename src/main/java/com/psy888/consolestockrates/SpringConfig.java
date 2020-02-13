@@ -32,7 +32,7 @@ public class SpringConfig {
 
     @Bean
     ScheduledExecutorService scheduledExecutorService(){
-        return new ScheduledThreadPoolExecutor(1);
+        return new ScheduledThreadPoolExecutor(2);
     }
 
 }

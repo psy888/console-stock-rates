@@ -53,14 +53,24 @@ public class ConsoleStockRatesApplication implements CommandLineRunner {
         System.out.println("Finish company query " + SECONDS.between(t, LocalTime.now()) + " seconds");
 //
         System.out.println("Start rate query");
+        updateRates();
+        scheduledExecutorService.scheduleAtFixedRate(uiServiceThread, 5000L, 10000L, TimeUnit.MILLISECONDS);
+
+        while (true) {
+            if(!executor2.isTerminated()){
+                wait(10L);
+            }else {
+                updateRates();
+            }
+        }
+
+//        System.out.println("Finish");
+    }
+
+    private void updateRates(){
         companyRepository.findAllByIsEnabledContaining("true").forEach(company -> {
             executor2.execute(rateUpdateThread.setSymbol(company.getSymbol()));
         });
-//        rateRequestQueue.updateAll();
-
-
-        scheduledExecutorService.scheduleAtFixedRate(uiServiceThread, 5000L, 10000L, TimeUnit.MILLISECONDS);
-
-        System.out.println("Finish");
+        executor2.shutdown();
     }
 }

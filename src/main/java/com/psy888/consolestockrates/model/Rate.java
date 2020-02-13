@@ -1,31 +1,42 @@
 package com.psy888.consolestockrates.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
+@Table
+@DynamicUpdate
+//@NamedEntityGraph(name = "GroupInfo.detail",
+//        attributeNodes = @NamedAttributeNode("members"))
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Rate implements RestData,Comparable<Rate> {
+public class Rate implements Serializable, Comparable<Rate> {
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.AUTO)
+//    private Long id;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+    @Column(insertable = false, updatable = false)
     private String symbol;
-    private String latestPrice;
-    private String changePercent;
-//    private String latestUpdate;
+    private double latestPrice;
+    private double changePercent;
+
+//    @Fetch(FetchMode.JOIN)
+    @JoinColumn(name = "symbol", referencedColumnName = "symbol")
+    @OneToOne(fetch = FetchType.LAZY)
+    private Company company;
 
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+//    public Long getId() {
+//        return id;
+//    }
+//
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
     public String getSymbol() {
         return symbol;
@@ -36,42 +47,49 @@ public class Rate implements RestData,Comparable<Rate> {
     }
 
     public String getLatestPrice() {
-        return latestPrice;
+        return String.valueOf(latestPrice);
     }
 
     public void setLatestPrice(String latestPrice) {
-        this.latestPrice = latestPrice;
+        try {
+            this.latestPrice = Double.parseDouble(latestPrice);
+        } catch (Exception e) {
+            this.latestPrice = 0;
+        }
     }
 
-    public String getChangePercent() {
+    public double getChangePercent() {
         return changePercent;
     }
 
     public void setChangePercent(String changePercent) {
-        this.changePercent = changePercent;
+        try {
+            this.changePercent = Double.parseDouble(changePercent);
+        } catch (Exception e) {
+            this.changePercent = 0;
+        }
     }
 
-//    public String getLatestUpdate() {
-//        return latestUpdate;
-//    }
+    public Company getCompany() {
+        return company;
+    }
 
-//    public void setLatestUpdate(String latestUpdate) {
-//        this.latestUpdate = latestUpdate;
-//    }
+    public void setCompany(Company company) {
+        this.company = company;
+    }
 
     @Override
     public String toString() {
         return "Rate{" +
-                "id=" + id +
-                ", symbol='" + symbol + '\'' +
-                ", latestPrice='" + latestPrice + '\'' +
-                ", changePercent='" + changePercent + '\'' +
-//                ", latestUpdate='" + latestUpdate + '\'' +
+                " symbol='" + symbol + '\'' +
+                ", company=" + company.getName() +
+                ", latestPrice=" + latestPrice +
+                ", changePercent=" + changePercent +
                 '}';
     }
 
     @Override
     public int compareTo(Rate o) {
-        return this.latestPrice.compareTo(o.latestPrice);
+        return Double.compare(latestPrice, o.latestPrice);
     }
 }

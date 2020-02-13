@@ -13,11 +13,11 @@ public class CompanyToDb {
     CompanyRepository companyRepository;
 
     public void saveToDb(List<Company> companies) {
-        companies.forEach(company -> {
-            if (companyRepository.findCompanyBySymbol(company.getSymbol()).isEmpty()) {
+//        companies.forEach(company -> {
+//            if (companyRepository.findCompanyBySymbol(company.getSymbol()).isEmpty()) {
                 companies.forEach(companyRepository::save);
-            }
-        });
+//            }
+//        });
     }
 
 }

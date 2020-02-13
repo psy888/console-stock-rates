@@ -2,37 +2,22 @@ package com.psy888.consolestockrates.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
-public class Company implements RestData {
-    @Id
+@Table
+public class Company implements Serializable {
+
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
+    @Id
+    @Column(unique = true, insertable = false, updatable = false)
     private String symbol;
-
     private String name;
     private String isEnabled;
 
-
-    public Company() {
-    }
-
-    /*
-    "symbol":"A",
-   "exchange":"NYS",
-   "name":"ThcA inigeonIg.entelcslo ",
-   "date":"2020-01-30",
-   "type":"cs",
-   "iexId":"IEX_46574843354B2D52",
-   "region":"US",
-   "currency":"USD",
-   "isEnabled":true
-     */
 
     public Long getId() {
         return id;

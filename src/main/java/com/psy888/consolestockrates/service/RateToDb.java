@@ -2,25 +2,27 @@ package com.psy888.consolestockrates.service;
 
 import com.psy888.consolestockrates.model.Rate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-
-@Service
+@Component
 public class RateToDb {
-
+    @Autowired
+    UIServiceThread uiServiceThread;
     @Autowired
     RateRepository rateRepository;
-    List<Rate> list = new LinkedList<>();
 
 
-    public void saveToDb(Rate rate) {
-        if (rateRepository.findTopBySymbolOrderByLatestPriceDesc(rate.getSymbol()) == null || rateRepository.findTopBySymbolOrderByLatestPriceDesc(rate.getSymbol()).compareTo(rate) != 0) {
-            rateRepository.save(rate);
-//            System.out.println(rate + " saved/updated ");
+    public void saveToDb(Rate latestRemote) {
+        Rate latestLocal = rateRepository.findBySymbol(latestRemote.getSymbol());
+        if (latestLocal == null || latestLocal.compareTo(latestRemote) < 0) {
+            if (latestLocal != null) {
+                latestLocal.setChangePercent(String.valueOf(latestRemote.getChangePercent()));
+                latestLocal.setLatestPrice(String.valueOf(latestRemote.getLatestPrice()));
+                uiServiceThread.addMassage(latestRemote + " updated.");
+            } else {
+                rateRepository.save(latestRemote);
+            }
         }
     }
 }

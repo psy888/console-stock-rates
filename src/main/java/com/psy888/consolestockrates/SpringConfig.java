@@ -3,11 +3,13 @@ package com.psy888.consolestockrates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 @Configuration
 @ComponentScan
@@ -20,16 +22,17 @@ public class SpringConfig {
 //
     @Bean(name = "taskExecutor")
     public ThreadPoolTaskExecutor taskExecutor() {
-        ThreadPoolTaskExecutor tpte =  new ThreadPoolTaskExecutor();
-//        tpte.setCorePoolSize(25);
-//        tpte.setMaxPoolSize(100);
-//        tpte.setAllowCoreThreadTimeOut(true);
-        return tpte;
+        return new ThreadPoolTaskExecutor();
     }
 
     @Bean(name = "cachedExecutor")
     public ExecutorService executor(){
         return Executors.newCachedThreadPool();
+    }
+
+    @Bean
+    ScheduledExecutorService scheduledExecutorService(){
+        return new ScheduledThreadPoolExecutor(1);
     }
 
 }

@@ -3,10 +3,8 @@ package com.psy888.consolestockrates.service;
 import com.psy888.consolestockrates.model.Rate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -38,9 +36,7 @@ public class UIServiceThread implements Runnable{
     //The top 5 highest value stocks
     void top5stocks() {
         List<Rate> topStocks = rateRepository.findTop5ByOrderByLatestPriceDesc();
-//        List<Rate> topStocks = rateRepository.findAll();
 
-//        topStocks.sort(Rate::compareTo);
         System.out.println(topStocks.get(0));
         topStocks.stream()
                 .skip(1)
@@ -52,7 +48,7 @@ public class UIServiceThread implements Runnable{
 
     //The most recent 5 companies that have the greatest change percent in stock value
     void top5change() {
-        rateRepository.findTop5ByOrderByChangePercentDesc().stream()
+        rateRepository.findTop5ByOrderByChangePercentDesc()
                 .forEach(System.out::println);
     }
 

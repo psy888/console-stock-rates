@@ -26,12 +26,11 @@ public class ConsoleStockRatesApplication implements CommandLineRunner {
     ApplicationContext context;
 
 
-    ExecutorService executor2;
+    ExecutorService taskExecutor;
     @Autowired
     RateUpdateThread rateUpdateThread;
 
-    @Autowired
-    RateRequestQueue rateRequestQueue;
+
 
     @Autowired
     UIServiceThread uiServiceThread;
@@ -45,7 +44,7 @@ public class ConsoleStockRatesApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        executor2 = context.getBean("cachedExecutor", ExecutorService.class);
+        taskExecutor = context.getBean("cachedExecutor", ExecutorService.class);
 
         System.out.println("Start company query");
         LocalTime t = LocalTime.now();
@@ -53,24 +52,19 @@ public class ConsoleStockRatesApplication implements CommandLineRunner {
         System.out.println("Finish company query " + SECONDS.between(t, LocalTime.now()) + " seconds");
 //
         System.out.println("Start rate query");
-        updateRates();
-        scheduledExecutorService.scheduleAtFixedRate(uiServiceThread, 5000L, 10000L, TimeUnit.MILLISECONDS);
+        scheduledExecutorService.scheduleAtFixedRate(this::updateRates, 0, 15L, TimeUnit.MINUTES);
+        scheduledExecutorService.scheduleAtFixedRate(uiServiceThread, 5L, 10L, TimeUnit.SECONDS);
 
-        while (true) {
-            if(!executor2.isTerminated()){
-                wait(10L);
-            }else {
-                updateRates();
-            }
-        }
 
 //        System.out.println("Finish");
     }
 
-    private void updateRates(){
-        companyRepository.findAllByIsEnabledContaining("true").forEach(company -> {
-            executor2.execute(rateUpdateThread.setSymbol(company.getSymbol()));
-        });
-        executor2.shutdown();
+    private void updateRates() {
+        if (taskExecutor.isTerminated()) {
+            companyRepository.findAllByIsEnabledContaining("true").forEach(company -> {
+                taskExecutor.execute(rateUpdateThread.setSymbol(company.getSymbol()));
+            });
+            taskExecutor.shutdown();
+        }
     }
 }
